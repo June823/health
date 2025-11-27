@@ -1,0 +1,136 @@
+ AI-Powered Health Monitoring System
+
+ Presentation Slides Outline (PowerPoint)
+
+ Slide 1: Title Slide
+
+Title: AI-Powered Health Monitoring System
+Author: June Oyugi
+Course: AI for Software Engineering
+Date: November 27, 2025
+
+---
+
+ Slide 2: Abstract / Overview
+
+ AI-powered system monitoring heart rate, SpO2, and activity.
+ Detects anomalies using IsolationForest.
+ Provides real-time actionable recommendations.
+
+---
+
+Slide 3: Problem Statement
+
+ Continuous health monitoring is essential.
+ Manual observation is impractical.
+ Need an automated AI system.
+
+---
+
+ Slide 4: Objectives
+
+ Monitor vital signs in real-time.
+ Detect anomalies automatically.
+ Provide recommendations via user interface.
+
+---
+
+ Slide 5: System Architecture Diagram
+
+ Frontend (HTML/JS) → Backend (FastAPI) → AI Model (IsolationForest)
+ Data flow arrows showing telemetry and prediction.
+
+---
+
+ Slide 6: Data Simulation
+
+ Simulated heart rate, SpO2, activity level.
+ Code snippet showing data generation.
+ Placeholder for chart example.
+
+---
+
+ Slide 7: AI Model
+
+ Algorithm: IsolationForest.
+ Detects anomalies in telemetry data.
+ Shows training pipeline and model saving.
+
+---
+
+ Slide 8: Backend (FastAPI)
+
+ Serves static frontend.
+ Exposes `/api/stream`, `/api/status`, `/api/train`, `/api/predict`.
+ Handles requests and sends model results.
+
+---
+
+ Slide 9: API Endpoints Overview
+
+ `/api/stream`: Live telemetry.
+ `/api/status`: Backend & model status.
+ `/api/train`: Retrain model.
+ `/api/predict`: Predict anomalies.
+
+---
+
+ Slide 10: Frontend / Live Dashboard
+
+ Displays live telemetry charts.
+ Shows anomaly alerts.
+ Polls backend endpoints.
+
+---
+
+ Slide 11: Telemetry Charts Example
+
+ Placeholder screenshot of live chart (heart rate & SpO2).
+ Code snippet showing dynamic update.
+
+---
+
+Slide 12: Anomaly Detection Alerts
+
+ Cards pop up when anomalies detected.
+ Color-coded indicators.
+ Example snippet of status display.
+
+---
+
+ Slide 13: Testing & Validation
+
+ Unit tests for backend & model.
+ Integration tests for end-to-end flow.
+ User simulation to trigger anomalies.
+
+---
+
+ Slide 14: Deployment
+
+ Local: Uvicorn server.
+ Optional cloud deployment (Docker + Azure/AWS).
+ REST API endpoints available for clients.
+
+---
+
+ Slide 15: Challenges & Solutions
+
+ OneDrive file locks → moved project folder.
+ Data privacy → used simulated data.
+ Model accuracy → fine-tuned parameters.
+ Scalability → backend handles multiple users.
+
+---
+
+ Slide 16: Conclusion
+
+ Fully functional AI-powered health monitoring prototype.
+ Real-time anomaly detection & recommendations.
+ Future work: real wearable integration, mobile app frontend.
+
+---
+
+ Slide 17: References
+
+ scikit-learn, FastAPI, Python, PhysioNet Database.
