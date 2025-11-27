@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI-Powered Health Monitor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+      :root{
+        --bg-1: linear-gradient(180deg,#0f172a 0%, #081226 100%);
+        --card-bg: rgba(255,255,255,0.03);
+        --glass: rgba(255,255,255,0.04);
+        --accent: #7dd3fc;
+        --muted: #94a3b8;
+        --success: #10b981;
+        --danger: #ef4444;
+        --glass-border: rgba(255,255,255,0.06);
+      }
+
+      html,body{height:100%;}
+      body { font-family: 'Inter', system-ui, -apple-system, Roboto, 'Segoe UI', Arial; margin:0; background: var(--bg-1); color: #e6eef6; }
+      .container{max-width:1200px; margin:32px auto; padding:20px;}
+
+      header{display:flex; justify-content:space-between; align-items:center; gap:16px}
+      h1{font-weight:700; font-size:1.45rem; color:#fff; margin:0}
+      .sub{color:var(--muted); font-size:0.95rem}
+
+      .toolbar{display:flex; gap:10px; align-items:center}
+      .btn{background:linear-gradient(180deg,#0ea5e9,#0284c7); border:none; color:#fff; padding:8px 14px; border-radius:10px; cursor:pointer; box-shadow:0 6px 18px rgba(2,132,199,0.18); font-weight:600}
+      .btn.secondary{background:transparent; border:1px solid rgba(255,255,255,0.08); color:var(--accent); box-shadow:none}
+      .btn.active{ background: #fff; color: #081226; border:1px solid rgba(0,0,0,0.06); box-shadow: 0 8px 24px rgba(2,6,23,0.12); transform: translateY(-2px); }
+      .btn.secondary.active{ background: #fff; color: #081226; border:1px solid rgba(0,0,0,0.06); box-shadow: 0 8px 24px rgba(2,6,23,0.06); }
+
+      .grid{display:grid; grid-template-columns: 360px 1fr; gap:20px; margin-top:26px}
+
+      .card{background:var(--card-bg); padding:16px; border-radius:14px; border:1px solid var(--glass-border); box-shadow: 0 6px 30px rgba(2,6,23,0.6)}
+      .metrics{display:flex; flex-direction:column; gap:12px}
+      .metric-row{display:flex; gap:10px}
+      .metric{flex:1; padding:12px; border-radius:10px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03)}
+      .metric h4{margin:0; font-size:0.95rem; color:var(--muted)}
+      .metric .value{font-size:1.6rem; font-weight:700}
+
+      #anomalyStatus{padding:6px 10px; border-radius:999px; display:inline-block; font-weight:700}
+      #recommendationCard{transition:all .2s ease}
+
+      .chartWrap{margin-top:12px; padding:12px; border-radius:10px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03)}
+
+      .anomalyList{max-height:220px; overflow:auto}
+      .anomalyList div{transition: transform .12s ease, opacity .18s ease}
+
+      footer{margin-top:18px; color:var(--muted); font-size:0.9rem; text-align:center}
+
+      @media (max-width: 980px){
+        .grid{grid-template-columns: 1fr;}
+      }
+    </style>
+  </head>
+<body>
+  <header style="display:flex; justify-content:space-between; align-items:center; gap:16px;">
+    <h1 style="margin:0">AI-Powered Health Monitor</h1>
+    <div style="display:flex; gap:12px; align-items:center;">
+      <div id="connIndicator" style="display:flex; align-items:center; gap:8px; padding:6px 10px; border-radius:20px; background:#eef6ff; border: 1px solid #d6eaff; color:#081226;">
+        <span id="connDotHeader" style="width:12px; height:12px; border-radius:50%; background:#f39c12; display:inline-block;"></span>
+        <div id="connText" style="font-size:0.9rem; color: #081226;">Connecting...</div>
+      </div>
+      <div id="modelIndicator" style="display:flex; align-items:center; gap:8px; padding:6px 10px; border-radius:20px; background:#f4f9f4; border: 1px solid #dff2df; color:#081226;">
+        <span id="modelDotHeader" style="width:12px; height:12px; border-radius:50%; background:#aaa; display:inline-block;"></span>
+        <div id="modelTextHeader" style="font-size:0.9rem; color: #081226;">Model: unknown</div>
+      </div>
+    </div>
+  </header>
+
+  <div id="controls" class="toolbar">
+    <button id="startBtn" class="btn">Start Live Stream</button>
+    <button id="stopBtn" class="btn secondary" disabled>Stop</button>
+    <button id="trainBtn" class="btn secondary">Retrain Model</button>
+  </div>
+
+  <div id="status" style="margin-top: 16px;">
+    <strong>Latest sample:</strong>
+    <span id="latest">—</span>
+  </div>
+
+  <div class="grid">
+    <aside>
+      <div class="card metrics">
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+          <div>
+            <div class="sub">Current metrics</div>
+            <div style="display:flex; gap:10px; margin-top:6px;">
+              <div class="metric">
+                <h4>Heart rate</h4>
+                <div class="value" id="heartRate">—</div>
+                <div class="sub">beats per minute</div>
+              </div>
+              <div class="metric">
+                <h4>SpO2</h4>
+                <div class="value" id="spO2">—</div>
+                <div class="sub">blood oxygen %</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:8px; margin-top:10px; align-items:center; justify-content:space-between;">
+          <div>
+            <div class="sub">Activity</div>
+            <div id="activity" style="font-weight:600; margin-top:2px">—</div>
+          </div>
+          <div style="text-align:right">
+            <div class="sub">Status</div>
+            <div style="margin-top:6px"><span id="anomalyStatus" style="color:var(--success); background:rgba(16,185,129,0.08); padding:6px 10px; border-radius:999px; border:1px solid rgba(16,185,129,0.12);">Normal</span></div>
+          </div>
+        </div>
+
+        <div id="recommendationCard" style="margin-top:14px; padding:12px; border-radius: 10px; display:none; border:1px solid rgba(255,160,160,0.12); background:linear-gradient(180deg, rgba(255,160,160,0.03), rgba(255,160,160,0.02));">
+          <h4 style="margin:0 0 8px 0; color:var(--danger)">Recommendation</h4>
+          <div id="recommendationText">—</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px;">
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+          <div style="font-weight:700">Model & Connection</div>
+          <small id="pointsCount_small" style="color:var(--muted)"></small>
+        </div>
+        <div style="margin-top:10px; display:flex; gap:10px; align-items:center; justify-content:space-between;">
+          <div style="display:flex; gap:10px; align-items:center;">
+            <div id="connDot" style="width:14px; height:14px; border-radius:50%; background:#ffa726;"></div>
+            <div><strong id="connLabel">Connecting…</strong><div class="sub">Live telemetry</div></div>
+          </div>
+          <div style="display:flex; gap:12px; align-items:center;">
+            <div id="modelDot" style="width:12px; height:12px; border-radius:50%; background:#aaa"></div>
+            <div id="modelText" class="sub">Model: unknown</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main>
+      <div class="card chartWrap">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+          <div>
+            <div style="font-weight:700; font-size:1.05rem">Live Health Stream</div>
+            <div class="sub">Streaming simulated wearable telemetry</div>
+          </div>
+          <div style="text-align:right; color:var(--muted);">Showing last <span id="pointsCount">0</span> points</div>
+        </div>
+
+        <canvas id="chart" height="220" style="margin-top:10px"></canvas>
+      </div>
+
+      <div class="card" style="margin-top:12px;">
+        <h3 style="margin:6px 0">Recent anomaly timeline</h3>
+        <div id="anomalyList" class="anomalyList" style="min-height:80px; padding: 12px;">
+          <em>No anomalies yet</em>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div style="margin-top:18px; display:flex; gap:18px; align-items:start; flex-wrap:wrap">
+    <div style="flex: 1 1 380px;">
+      <h3 style="margin:6px 0">Recent anomaly timeline</h3>
+      <div id="anomalyList" style="min-height:80px; padding: 12px; background:black; border-radius:8px; border:1px solid #efeff7;">
+        <em>No anomalies yet</em>
+      </div>
+    </div>
+
+    <div style="width:320px;">
+      <h3 style="margin:6px 0">Quick checks</h3>
+      <div style="padding:12px; border-radius:8px; border:1px dashed #ddd; background: black">
+        <ul style="padding-left:18px; margin:0">
+          <li>Live stream: polls <code>/api/stream</code> every second</li>
+          <li>Health check: <code>/api/status</code> (used to display connection and model status)</li>
+          <li>Retrain model: calls <code>/api/train</code></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="/static/script.js"></script>
+</body>
+</html>
