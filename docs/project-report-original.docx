@@ -1,0 +1,195 @@
+ AI-Powered Health Monitoring System
+
+Project Report
+
+Title Page
+
+Project Title:** AI-Powered Health Monitoring System
+Author: June Oyugi
+Course: AI for Software Engineering
+Date: November 27, 2025
+
+---
+
+ Abstract
+
+This project presents an AI-powered health monitoring system that collects and analyzes telemetry from wearable devices, detects anomalies in vital signs, and provides actionable health recommendations. Using a combination of Python, FastAPI, and machine learning (IsolationForest), the system demonstrates real-time health monitoring and a user-friendly interface.
+
+---
+
+ 1. Introduction
+
+Problem Statement: Individuals using wearable devices need a system that can monitor health metrics continuously and detect anomalies without manual intervention.
+
+Objectives:
+
+ Monitor heart rate, SpO2, and activity level in real-time.
+ Detect anomalies using AI.
+ Provide actionable recommendations through a user-friendly interface.
+
+Significance: Early detection of abnormal health conditions can prevent medical emergencies and improve personal health awareness.
+
+---
+
+2. System Architecture
+
+Overview: The system consists of three main components:
+
+1. Frontend: Static UI displaying live telemetry.
+2. Backend: FastAPI serving endpoints and processing data.
+3. Model: IsolationForest trained to detect anomalies.
+
+Data Flow Diagram:
+
+```
+User's Browser (Frontend)
+  |
+  v
+FastAPI Backend (Endpoints: /api/stream, /api/status, /api/train)
+  |
+  v
+AI Model (IsolationForest) -> Returns Anomaly Status
+```
+
+---
+
+3. Data Simulation and Preprocessing
+
+Data Source: Simulated wearable telemetry.
+
+Python Example:
+
+```python
+import pandas as pd
+import numpy as np
+
+data = {
+    'timestamp': pd.date_range(start='2023-10-01', periods=100, freq='T'),
+    'heart_rate': np.random.randint(60, 100, 100),
+    'blood_oxygen': np.random.randint(90, 100, 100),
+    'activity_level': np.random.choice(['low', 'moderate', 'high'], 100)
+}
+df = pd.DataFrame(data)
+```
+
+Preprocessing: Normalization of heart rate and SpO2, encoding categorical activity levels.
+
+---
+
+4. AI Model
+
+Algorithm: IsolationForest for anomaly detection.
+
+Training Example:
+
+```python
+from sklearn.ensemble import IsolationForest
+
+model = IsolationForest(contamination=0.1)
+df['anomaly'] = model.fit_predict(df[['heart_rate', 'blood_oxygen']])
+df['anomaly'] = df['anomaly'].apply(lambda x: 'Anomaly' if x == -1 else 'Normal')
+```
+
+Model Persistence: Saved to `backend/model/anomaly_model.pkl` for reuse.
+
+---
+
+ 5. Backend (FastAPI)
+
+Main Features:
+
+ Serves frontend static files.
+ Exposes endpoints for streaming, prediction, status, and training.
+
+Endpoints:
+
+ `/api/stream`: Returns simulated live telemetry.
+ `/api/status`: Returns backend connection and model load status.
+ `/api/train`: Retrains the IsolationForest model.
+ `/api/predict`: Returns anomaly prediction.
+
+Example:
+
+```python
+from fastapi import FastAPI
+app = FastAPI()
+
+@app.get('/api/status')
+def status():
+    return {'status': 'Backend running', 'model_loaded': True}
+```
+
+---
+
+ 6. Frontend
+
+Features:
+
+ Live charts for heart rate and SpO2.
+ Anomaly alerts and notifications.
+ Polls backend endpoints for telemetry updates.
+
+Example (HTML/JS):
+
+```html
+<script src="script.js"></script>
+<div id="chart"></div>
+<div id="alerts"></div>
+```
+
+**script.js** polls `/api/stream` and updates charts dynamically.
+
+---
+
+ 7. Testing and Validation
+
+Unit Testing: Individual components like data simulation, model prediction.
+
+Integration Testing:** Frontend → Backend → Model.
+
+Example:
+
+ Open browser → check live chart updates.
+ Trigger anomaly → alert card appears.
+
+---
+
+ 8. Deployment
+
+Local Deployment: Run FastAPI server with Uvicorn and access frontend at `http://127.0.0.1:8000/`.
+
+Cloud Deployment (Optional):
+
+ Dockerize backend.
+ Use Azure/AWS App Service for hosting.
+ Expose endpoints as REST API.
+
+---
+
+ 9. Challenges and Solutions
+
+OneDrive file locks: Moved project outside OneDrive.
+Data privacy: Simulated data used; real deployment must comply with HIPAA/GDPR.
+Model accuracy: Use more data and fine-tune contamination parameter.
+Scalability: Backend designed to handle multiple simultaneous users.
+
+---
+
+ 10. Conclusion and Recommendations
+
+ Functional AI-powered health monitoring prototype.
+ Real-time telemetry visualization and anomaly detection.
+ Future work: integrate real wearable device APIs, advanced predictive models, mobile app frontend.
+
+---
+
+ References
+
+ scikit-learn documentation: [https://scikit-learn.org](https://scikit-learn.org)
+ FastAPI documentation: [https://fastapi.tiangolo.com](https://fastapi.tiangolo.com)
+ Python documentation: [https://python.org](https://python.org)
+ PhysioNet Database: [https://physionet.org](https://physionet.org)
+
+---
+
+
